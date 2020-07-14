@@ -1,0 +1,40 @@
+html {
+    font-size: 10px;
+    font-family: "Open Sans";
+    background-color: #AAA;
+}
+
+body {
+    margin: 0 auto; /* first value top/bottom, second left and right. Auto= maximal equal margin on both sides. */
+    background-color: rgb(233, 233, 233);
+    padding: 0 20px 20px 20px;
+    border: 5px solid black;
+}
+
+h1 {
+    margin: 0;
+    padding: 20px 0;
+    font-size: 60px;
+    text-align: center;
+    color: #00539F;
+    text-shadow: 3px 3px 1px black;
+}
+
+p, li {
+    font-size: 16px;
+    line-height: 2;
+    letter-spacing: 1px
+}
+p:hover, h1:hover {
+    color: blue;
+}
+
+img {
+    display: block; /* treat image as block element (like body) rather than inline element */
+    margin: 0 auto;
+    width: 400px
+}
+
+canvas{
+    border: 1px solid black;
+}
