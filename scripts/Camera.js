@@ -3,50 +3,38 @@ class Camera {
         this.pos = p;
         this.foc = f;
         this.fov = Math.tan(v);
-        this.width = w;
-        this.height = h;
 
-        const dir = f.minus(p);
-        const pan = Math.atan2(dir.v[1], dir.v[0]);
-        const tilt = Math.asin(dir.v[2] / dir.len);
+        this.W = w;
+        this.H = h;
 
-        const [cp, sp] = [Math.cos(pan), Math.sin(pan)];
-        const unpan = new Matrix(
-            [
-                [cp, sp, 0],
-                [-sp, cp, 0],
-                [0, 0, 1]
-            ]
-        );
+        /**Create orthonormal frame with
+         * "Z" axis pointing in dir of cam gaze &
+         * "X", "Y" axes in dir of those of canvas
+         */
+        let Z = f.minus(p).norm;
+        let X = Z.cross(V(0,0,1)).norm;
+        let Y = Z.cross(X);
 
-        const [ct, st] = [Math.cos(tilt), Math.sin(tilt)];
-        const untilt = new Matrix(
-            [
-                [ct, 0, st],
-                [0, 1, 0],
-                [-st, 0, ct]
-            ]
-        );
-
-        this.matrix = untilt.multiply(unpan);
+        this.frame = [X,Y,Z];
     }
 
     project(p) {
-        const disp = p.minus(this.pos);
-        const { v: [x, y, z] } = this.matrix.apply(disp);
+        const dis = p.minus(this.pos);
+        const [x, y, z] = this.frame.map(f => dis.inner(f));
+        const dep = this.W / this.fov / z;
 
-        const X = (-y / (x * this.fov) + 1) * this.width / 2;
-        const Y = (-z / (x * this.fov) + this.height / this.width) * this.width / 2;
+        const X = (this.W + x*dep) / 2;
+        const Y = (this.H + y*dep) / 2;
 
         return { X, Y };
     }
 
     projTo3d(v1) {
-        const v2 = V(...this.matrix.entries[0]).norm.scale(v1.v[3]);
+        const v2 = this.frame[2].scale(v1.v[3]);
         return v2.add(v1);
     }
 
-    projTo3d2(u){
-        return V(u.v[0]+(1/3)*u.v[3], u.v[1]+(1/3)*u.v[3],u.v[2]+(1/3)*u.v[3]);
+    projTo3d2( {v: [x,y,z,w]} ){
+        return V(x+w/3, y+w/3, z+w/3);
     }
 }
