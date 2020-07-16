@@ -3,9 +3,9 @@
 const myHeading = document.querySelector('h1');
 myHeading.textContent = 'Hello worrrld!';
 
-document.querySelector('html').onclick = function () {
-    //alert('ow'); /* alert opens a dialog box */
-}
+let r = new Rotation(0,0);
+
+
 
 const canvas = document.getElementById('tutorial');
 const ctx = canvas.getContext('2d');
@@ -19,12 +19,12 @@ function colour(pt, cam) {
 }
 
 
-function drawPoints(points, a, b, ctx) {
-    const pos = V(5 * Math.cos(a), 7 * Math.sin(a), 0);
+function drawPoints(points, camA, xy, xz, xw, yz, yw, zw, ctx) {
+    const pos = V(5 * Math.cos(camA), 7 * Math.sin(camA), 0);
     const cam = new Camera(pos, V(0, 0, 0), Math.PI / 4, canvas.width, canvas.height);
 
     const [cb, sb] = [Math.cos(b), Math.sin(b)];
-    const rotate1 = new Matrix(
+    const xy =  new Matrix(
         [
             [1, 0, 0, 0],
             [0, 1, 0, 0],
@@ -32,7 +32,7 @@ function drawPoints(points, a, b, ctx) {
             [0, 0, sb, cb]
         ]
     )
-    const rotate2 = new Matrix(
+    const xz = new Matrix(
         [
             [1, 0, 0, 0],
             [0, cb, 0, -sb],
@@ -41,7 +41,7 @@ function drawPoints(points, a, b, ctx) {
         ]
     )
     
-    const rpoints = points.map(p => rotate1.apply(p));
+    const rpoints = points.map(p => xy.apply(p));
     const p1 = rpoints[0];
 
     const ppoints = rpoints.map(p => {
@@ -62,7 +62,7 @@ function drawPoints(points, a, b, ctx) {
         ctx.lineTo(p[0]+1,p[1]+1);
         }
     });
-    ctx.stroke();
+    //ctx.stroke();
 
     edges.forEach((row,i) => {
         row.slice(0, i).forEach( (edge,j) => {
@@ -98,12 +98,26 @@ const edges = points.map(p1 =>
     )
 );
 
-(function draw(time) {
-    requestAnimationFrame(draw);
+
+document.querySelector('html').onkeydown= function (event)  {
+
+    switch(event.code){
+        case "ArrowUp":
+            r.xy +=30;
+        break;
+        case "ArrowDown":
+            r.xy -=30;
+        break;
+
+        case "ArrowRight":
+            r.xz +=30;
+        break;
+        case "ArrowLeft":
+            r.xz -=30;
+        break;
+        default:    
+    }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    //restore path
-    //update path
-    //save
-    drawPoints(points, time*1/1520,time*1/1500, ctx);
-    
-})(0);
+    drawPoints(points, r.xy*1/1520,r.xz*1/1500, ctx);
+    event.preventDefault();
+}
