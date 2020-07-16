@@ -30,9 +30,9 @@ class Vector {
     }
     cross(that) {
         return new Vector(
-            [0, 1, 2].map(i =>
-                this.v[ (i+1)%3 ]*that.v[ (i+2)%3 ]
-                -this.v[ (i+2)%3 ]*that.v[ (i+1)%3 ]
+            [1, 2, 0].map(i =>
+                this.v[i] * that.v[ (i+1)%3 ]
+                -that.v[i] * this.v[ (i+1)%3 ]
             )
         );
     }
